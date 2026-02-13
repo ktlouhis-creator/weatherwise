@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeatherWise — Live Weather, Daily Wisdom & Today in History</title>
+  <meta name="description" content="Get real-time weather with beautiful dynamic visuals, daily wisdom quotes from philosophers, scientists, and spiritual leaders, plus famous birthdays and historical events for today.">
+  <meta name="keywords" content="weather, live weather, daily quotes, today in history, famous birthdays, philosophical quotes, Christian quotes, weather forecast">
+  <meta property="og:title" content="WeatherWise — Live Weather, Daily Wisdom & Today in History">
+  <meta property="og:description" content="Beautiful dynamic weather with quotes from Einstein, Mother Teresa, Marcus Aurelius, and more. Discover who was born today.">
+  <meta property="og:type" content="website">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://weatherwise.app">
+
+  <!-- Google Ads -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "WeatherWise",
+    "description": "Live weather with dynamic visuals, daily wisdom quotes, and today in history.",
+    "applicationCategory": "WeatherApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #3b82f6;
+      --bg-start: #0f172a;
+      --bg-end: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --card-bg: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.12);
+      --accent: #fbbf24;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 1.5s ease;
+    }
+
+    /* ===== WEATHER BACKGROUNDS ===== */
+    body.sunny { background: linear-gradient(135deg, #f59e0b, #ea580c, #dc2626); }
+    body.cloudy { background: linear-gradient(135deg, #475569, #64748b, #94a3b8); }
+    body.rainy { background: linear-gradient(135deg, #1e3a5f, #2d4a7a, #374151); }
+    body.snowy { background: linear-gradient(135deg, #bfdbfe, #93c5fd, #dbeafe); --text: #1e293b; --text-muted: #475569; --card-bg: rgba(0,0,0,0.06); --card-border: rgba(0,0,0,0.1); }
+    body.stormy { background: linear-gradient(135deg, #0c0c1d, #1a1a2e, #16213e); }
+    body.misty { background: linear-gradient(135deg, #6b7280, #9ca3af, #d1d5db); --text: #1f2937; --text-muted: #4b5563; }
+    body.clear-night { background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81); }
+
+    /* ===== HOLIDAY THEMES ===== */
+    body.valentine { --accent: #ec4899; --primary: #f43f5e; }
+    body.valentine::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 30%, rgba(244,63,94,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(236,72,153,0.1) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+    body.christmas { --accent: #dc2626; --primary: #16a34a; }
+    body.easter { --accent: #a78bfa; --primary: #c084fc; }
+    body.easter::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 30% 20%, rgba(167,139,250,0.1) 0%, transparent 40%); pointer-events: none; z-index: 0; }
+    body.independence { --accent: #dc2626; --primary: #2563eb; }
+    body.halloween { --accent: #f97316; --primary: #f97316; background: linear-gradient(135deg, #1c1917, #292524, #44403c) !important; }
+    body.newyear { --accent: #fbbf24; --primary: #fbbf24; }
+
+    /* ===== RAIN ANIMATION ===== */
+    .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+    .raindrop {
+      position: absolute;
+      top: -20px;
+      width: 2px;
+      height: 15px;
+      background: linear-gradient(transparent, rgba(174,194,224,0.5));
+      border-radius: 0 0 2px 2px;
+      animation: rain-fall linear infinite;
+    }
+    @keyframes rain-fall {
+      0% { transform: translateY(-20px); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0.3; }
+    }
+
+    /* ===== SNOW ANIMATION ===== */
+    .snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+    .snowflake {
+      position: absolute;
+      top: -10px;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: snow-fall linear infinite;
+    }
+    @keyframes snow-fall {
+      0% { transform: translateY(-10px) rotate(0deg) translateX(0px); opacity: 0.9; }
+      50% { transform: translateY(50vh) rotate(180deg) translateX(30px); }
+      100% { transform: translateY(100vh) rotate(360deg) translateX(-10px); opacity: 0.2; }
+    }
+
+    /* ===== LIGHTNING ===== */
+    .lightning { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    @keyframes lightning-flash {
+      0%, 95%, 100% { opacity: 0; }
+      96%, 97% { opacity: 0.3; background: white; }
+    }
+    .lightning.active { animation: lightning-flash 6s infinite; }
+
+    /* ===== STARS (clear night) ===== */
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    /* ===== LAYOUT ===== */
+    .app-container { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; padding: 24px 16px; min-height: 100vh; }
+
+    /* ===== HEADER ===== */
+    .header { text-align: center; margin-bottom: 24px; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .tagline { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    .live-clock span { animation: clock-pulse 1s ease-in-out infinite alternate; }
+    @keyframes clock-pulse { 0% { opacity: 0.85; } 100% { opacity: 1; } }
+
+    /* ===== SEARCH ===== */
+    .search-section { margin-bottom: 32px; }
+    .search-box {
+      display: flex; gap: 8px; max-width: 500px; margin: 0 auto;
+    }
+    .search-box input {
+      flex: 1; padding: 14px 20px; border-radius: 50px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg); color: var(--text);
+      font-size: 1rem; font-family: 'Inter', sans-serif;
+      backdrop-filter: blur(10px);
+      outline: none; transition: border-color 0.3s;
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .search-box input:focus { border-color: var(--accent); }
+    .search-box button {
+      padding: 14px 28px; border-radius: 50px; border: none;
+      background: var(--primary); color: white;
+      font-weight: 600; cursor: pointer; font-size: 0.95rem;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .search-box button:hover { transform: scale(1.02); opacity: 0.9; }
+    .search-box button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .geo-btn {
+      display: block; margin: 10px auto 0; background: none; border: none;
+      color: var(--text-muted); cursor: pointer; font-size: 0.85rem;
+      text-decoration: underline; font-family: 'Inter', sans-serif;
+    }
+    .geo-btn:hover { color: var(--text); }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 28px; margin-bottom: 20px;
+      backdrop-filter: blur(12px); transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card-title {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--accent); margin-bottom: 16px;
+    }
+
+    /* ===== WEATHER DISPLAY ===== */
+    .weather-main { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .weather-temp { font-size: 5rem; font-weight: 300; line-height: 1; }
+    .weather-temp sup { font-size: 2rem; vertical-align: super; }
+    .weather-info { text-align: right; }
+    .weather-desc { font-size: 1.3rem; font-weight: 500; text-transform: capitalize; margin-bottom: 4px; }
+    .weather-city { font-size: 1rem; color: var(--text-muted); }
+    .weather-icon { font-size: 4rem; }
+    .weather-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 20px; }
+    .weather-detail { text-align: center; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.04); }
+    .weather-detail .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .weather-detail .value { font-size: 1.2rem; font-weight: 600; margin-top: 4px; }
+
+    /* ===== FORECAST ===== */
+    .forecast-row { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; }
+    .forecast-item {
+      flex: 0 0 auto; text-align: center; padding: 12px 16px;
+      border-radius: 12px; background: rgba(255,255,255,0.04); min-width: 80px;
+    }
+    .forecast-item .time { font-size: 0.75rem; color: var(--text-muted); }
+    .forecast-item .icon { font-size: 1.5rem; margin: 6px 0; }
+    .forecast-item .temp { font-weight: 600; }
+
+    /* ===== HOLIDAY BANNER ===== */
+    .holiday-banner {
+      text-align: center; padding: 16px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05));
+      border: 1px solid rgba(251,191,36,0.2); margin-bottom: 20px;
+    }
+    .holiday-banner .holiday-icon { font-size: 2rem; }
+    .holiday-banner .holiday-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-top: 8px; }
+
+    /* ===== QUOTE SECTION ===== */
+    .quote-text {
+      font-family: 'Playfair Display', serif; font-size: 1.3rem;
+      font-style: italic; line-height: 1.6; margin-bottom: 12px;
+    }
+    .quote-author { color: var(--accent); font-weight: 500; }
+    .quote-category {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      background: rgba(255,255,255,0.08); font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
+      margin-left: 8px;
+    }
+    .new-quote-btn {
+      margin-top: 16px; padding: 8px 20px; border-radius: 20px;
+      border: 1px solid var(--card-border); background: transparent;
+      color: var(--text-muted); cursor: pointer; font-size: 0.8rem;
+      font-family: 'Inter', sans-serif; transition: all 0.3s;
+    }
+    .new-quote-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ===== BIRTHDAYS ===== */
+    .birthday-list { display: flex; flex-direction: column; gap: 12px; }
+    .birthday-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.03);
+      transition: background 0.3s;
+    }
+    .birthday-item:hover { background: rgba(255,255,255,0.06); }
+    .birthday-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--card-bg); display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+      border: 2px solid var(--card-border);
+    }
+    .birthday-name { font-weight: 600; font-size: 0.95rem; }
+    .birthday-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .birthday-year { font-size: 0.75rem; color: var(--accent); margin-top: 2px; }
+
+    /* ===== AD SLOTS ===== */
+    .ad-slot {
+      padding: 20px; text-align: center; border-radius: 16px;
+      background: rgba(255,255,255,0.03); border: 1px dashed var(--card-border);
+      margin-bottom: 20px; min-height: 100px; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 0.75rem;
+    }
+
+    /* ===== AFFILIATE SECTION ===== */
+    .affiliate-card {
+      display: flex; align-items: center; gap: 16px; padding: 16px;
+      border-radius: 14px; background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
+      border: 1px solid rgba(59,130,246,0.2); cursor: pointer;
+      transition: transform 0.2s; text-decoration: none; color: var(--text);
+    }
+    .affiliate-card:hover { transform: translateY(-2px); }
+    .affiliate-icon { font-size: 2rem; }
+    .affiliate-title { font-weight: 600; font-size: 0.95rem; }
+    .affiliate-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .affiliate-tag {
+      font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 1px; margin-top: 4px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center; padding: 40px 0 20px; color: var(--text-muted);
+      font-size: 0.8rem; border-top: 1px solid var(--card-border); margin-top: 40px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ===== LOADING ===== */
+    .loading { text-align: center; padding: 40px; }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid var(--card-border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg { text-align: center; padding: 16px; color: #f87171; font-size: 0.9rem; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .weather-temp { font-size: 3.5rem; }
+      .weather-main { justify-content: center; text-align: center; }
+      .weather-info { text-align: center; }
+      .quote-text { font-size: 1.1rem; }
+      .app-container { padding: 16px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    // ===== CONFIG =====
+    const OWM_KEY = 'YOUR_OPENWEATHERMAP_API_KEY'; // Replace with real key
+
+    // ===== WEATHER ICON MAP =====
+    const weatherIcons = {
+      '01d': '☀️', '01n': '🌙', '02d': '⛅', '02n': '☁️',
+      '03d': '☁️', '03n': '☁️', '04d': '☁️', '04n': '☁️',
+      '09d': '🌧️', '09n': '🌧️', '10d': '🌦️', '10n': '🌧️',
+      '11d': '⛈️', '11n': '⛈️', '13d': '🌨️', '13n': '🌨️',
+      '50d': '🌫️', '50n': '🌫️'
+    };
+
+    // ===== MASSIVE QUOTES DATABASE =====
+    const quotes = [
+      // Christian / Spiritual
+      { text: "Faith is taking the first step even when you don't see the whole staircase.", author: "Martin Luther King Jr.", category: "Faith" },
+      { text: "Do not be afraid; just believe.", author: "Mark 5:36", category: "Scripture" },
+      { text: "If you judge people, you have no time to love them.", author: "Mother Teresa", category: "Faith" },
+      { text: "Not all of us can do great things. But we can do small things with great love.", author: "Mother Teresa", category: "Faith" },
+      { text: "God doesn't require us to succeed, He only requires that you try.", author: "Mother Teresa", category: "Faith" },
+      { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you.", author: "Jeremiah 29:11", category: "Scripture" },
+      { text: "The Lord is my shepherd; I shall not want.", author: "Psalm 23:1", category: "Scripture" },
+      { text: "Let all that you do be done in love.", author: "1 Corinthians 16:14", category: "Scripture" },
+      { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", author: "Joshua 1:9", category: "Scripture" },
+      { text: "Darkness cannot drive out darkness; only light can do that.", author: "Martin Luther King Jr.", category: "Faith" },
+      { text: "God has a purpose for your pain, a reason for your struggles, and a reward for your faithfulness.", author: "Romans 8:28", category: "Faith" },
+      { text: "Pray as though everything depended on God. Work as though everything depended on you.", author: "Saint Augustine", category: "Faith" },
+
+      // Stoic Philosophy
+      { text: "We suffer more in imagination than in reality.", author: "Seneca", category: "Stoic" },
+      { text: "The happiness of your life depends upon the quality of your thoughts.", author: "Marcus Aurelius", category: "Stoic" },
+      { text: "He who fears death will never do anything worthy of a man who is alive.", author: "Seneca", category: "Stoic" },
+      { text: "You have power over your mind — not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius", category: "Stoic" },
+      { text: "It is not that we have a short time to live, but that we waste a great deal of it.", author: "Seneca", category: "Stoic" },
+      { text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius", category: "Stoic" },
+      { text: "First say to yourself what you would be; then do what you have to do.", author: "Epictetus", category: "Stoic" },
+      { text: "No man is free who is not master of himself.", author: "Epictetus", category: "Stoic" },
+      { text: "The best revenge is not to be like your enemy.", author: "Marcus Aurelius", category: "Stoic" },
+
+      // Philosophers
+      { text: "The unexamined life is not worth living.", author: "Socrates", category: "Philosophy" },
+      { text: "I think, therefore I am.", author: "René Descartes", category: "Philosophy" },
+      { text: "He who has a why to live can bear almost any how.", author: "Friedrich Nietzsche", category: "Philosophy" },
+      { text: "The only true wisdom is in knowing you know nothing.", author: "Socrates", category: "Philosophy" },
+      { text: "One cannot step twice in the same river.", author: "Heraclitus", category: "Philosophy" },
+      { text: "To be yourself in a world constantly trying to make you something else is the greatest accomplishment.", author: "Ralph Waldo Emerson", category: "Philosophy" },
+      { text: "Liberty consists in doing what one desires.", author: "John Stuart Mill", category: "Philosophy" },
+
+      // Scientists
+      { text: "Imagination is more important than knowledge.", author: "Albert Einstein", category: "Science" },
+      { text: "If I have seen further it is by standing on the shoulders of giants.", author: "Isaac Newton", category: "Science" },
+      { text: "The important thing is not to stop questioning. Curiosity has its own reason for existing.", author: "Albert Einstein", category: "Science" },
+      { text: "The present is theirs; the future, for which I really worked, is mine.", author: "Nikola Tesla", category: "Science" },
+      { text: "If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.", author: "Nikola Tesla", category: "Science" },
+      { text: "Nothing in life is to be feared, it is only to be understood.", author: "Marie Curie", category: "Science" },
+      { text: "The good thing about science is that it's true whether or not you believe in it.", author: "Neil deGrasse Tyson", category: "Science" },
+      { text: "The cosmos is within us. We are made of star-stuff.", author: "Carl Sagan", category: "Science" },
+      { text: "Life is like riding a bicycle. To keep your balance, you must keep moving.", author: "Albert Einstein", category: "Science" },
+
+      // Actors / Entertainers / Comedians
+      { text: "In the middle of difficulty lies opportunity.", author: "Bruce Lee", category: "Wisdom" },
+      { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde", category: "Wit" },
+      { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela", category: "Leadership" },
+      { text: "Life is what happens when you're busy making other plans.", author: "John Lennon", category: "Wisdom" },
+      { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky", category: "Wisdom" },
+      { text: "I have not failed. I've just found 10,000 ways that won't work.", author: "Thomas Edison", category: "Science" },
+      { text: "Be the change you wish to see in the world.", author: "Mahatma Gandhi", category: "Leadership" },
+      { text: "Behind every great man is a woman rolling her eyes.", author: "Jim Carrey", category: "Comedy" },
+      { text: "I'm not superstitious, but I am a little stitious.", author: "Michael Scott (Steve Carell)", category: "Comedy" },
+      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs", category: "Innovation" },
+
+      // Modern Leaders / Innovators
+      { text: "When something is important enough, you do it even if the odds are not in your favor.", author: "Elon Musk", category: "Innovation" },
+      { text: "Persistence is very important. You should not give up unless you are forced to give up.", author: "Elon Musk", category: "Innovation" },
+      { text: "Your time is limited, don't waste it living someone else's life.", author: "Steve Jobs", category: "Innovation" },
+      { text: "Move fast and break things. Unless you are breaking stuff, you are not moving fast enough.", author: "Mark Zuckerberg", category: "Innovation" },
+      { text: "It's fine to celebrate success but it is more important to heed the lessons of failure.", author: "Bill Gates", category: "Innovation" },
+
+      // Political / Historical
+      { text: "The only thing we have to fear is fear itself.", author: "Franklin D. Roosevelt", category: "Leadership" },
+      { text: "In the end, it's not the years in your life that count. It's the life in your years.", author: "Abraham Lincoln", category: "Leadership" },
+      { text: "Ask not what your country can do for you — ask what you can do for your country.", author: "John F. Kennedy", category: "Leadership" },
+      { text: "We shall fight on the beaches, we shall never surrender.", author: "Winston Churchill", category: "Leadership" },
+      { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", category: "Leadership" },
+      { text: "Injustice anywhere is a threat to justice everywhere.", author: "Martin Luther King Jr.", category: "Leadership" },
+      { text: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela", category: "Leadership" },
+    ];
+
+    // ===== FAMOUS BIRTHDAYS BY DATE (MM-DD) =====
+    const birthdayDB = {
+      "01-01": [
+        { name: "J. Edgar Hoover", desc: "First FBI Director", year: "1895", icon: "🏛️" },
+        { name: "Betsy Ross", desc: "Credited with first US flag", year: "1752", icon: "🇺🇸" },
+        { name: "Paul Revere", desc: "American Revolution patriot", year: "1735", icon: "🐴" },
+      ],
+      "01-08": [
+        { name: "Elvis Presley", desc: "King of Rock and Roll", year: "1935", icon: "🎵" },
+        { name: "Stephen Hawking", desc: "Theoretical physicist", year: "1942", icon: "🔬" },
+        { name: "David Bowie", desc: "Music legend & icon", year: "1947", icon: "⭐" },
+      ],
+      "01-15": [
+        { name: "Martin Luther King Jr.", desc: "Civil rights leader", year: "1929", icon: "✊" },
+        { name: "Aristotle Onassis", desc: "Shipping magnate", year: "1906", icon: "🚢" },
+      ],
+      "01-17": [
+        { name: "Muhammad Ali", desc: "Greatest boxer of all time", year: "1942", icon: "🥊" },
+        { name: "Benjamin Franklin", desc: "Founding Father, inventor", year: "1706", icon: "⚡" },
+        { name: "Michelle Obama", desc: "44th First Lady of the US", year: "1964", icon: "🏛️" },
+      ],
+      "01-27": [
+        { name: "Wolfgang Amadeus Mozart", desc: "Classical music genius", year: "1756", icon: "🎸" },
+        { name: "Lewis Carroll", desc: "Author of Alice in Wonderland", year: "1832", icon: "📖" },
+      ],
+      "02-04": [
+        { name: "Rosa Parks", desc: "Civil rights activist", year: "1913", icon: "✊" },
+      ],
+      "02-11": [
+        { name: "Thomas Edison", desc: "Inventor of the light bulb", year: "1847", icon: "💡" },
+        { name: "Jennifer Aniston", desc: "Actress, producer", year: "1969", icon: "🎬" },
+      ],
+      "02-12": [
+        { name: "Abraham Lincoln", desc: "16th President of the US", year: "1809", icon: "🏛️" },
+        { name: "Charles Darwin", desc: "Father of evolution theory", year: "1809", icon: "🔬" },
+      ],
+      "02-13": [  // TODAY!
+        { name: "Galileo Galilei", desc: "Father of modern observational astronomy", year: "1564", icon: "🔭" },
+        { name: "Peter Gabriel", desc: "Musician, humanitarian", year: "1950", icon: "🎵" },
+        { name: "Robbie Williams", desc: "Pop music icon", year: "1974", icon: "🎤" },
+        { name: "Jerry Springer", desc: "TV host, politician", year: "1944", icon: "📺" },
+        { name: "Mena Suvari", desc: "Actress (American Beauty)", year: "1979", icon: "🎬" },
+      ],
+      "02-14": [
+        { name: "Frederick Douglass", desc: "Abolitionist, statesman (chosen birthday)", year: "1818", icon: "✊" },
+        { name: "Michael Bloomberg", desc: "Business magnate, politician", year: "1942", icon: "💼" },
+      ],
+      "02-22": [
+        { name: "George Washington", desc: "1st President of the US", year: "1732", icon: "🇺🇸" },
+      ],
+      "03-14": [
+        { name: "Albert Einstein", desc: "Theoretical physicist, E=mc²", year: "1879", icon: "🧠" },
+        { name: "Stephen Curry", desc: "NBA champion", year: "1988", icon: "🏀" },
+      ],
+      "03-26": [
+        { name: "Diana Ross", desc: "Music legend, actress", year: "1944", icon: "🎤" },
+        { name: "Keira Knightley", desc: "Actress", year: "1985", icon: "🎬" },
+      ],
+      "04-15": [
+        { name: "Leonardo da Vinci", desc: "Renaissance genius", year: "1452", icon: "🎨" },
+        { name: "Emma Watson", desc: "Actress, UN ambassador", year: "1990", icon: "🎬" },
+      ],
+      "04-21": [
+        { name: "Queen Elizabeth II", desc: "Longest-reigning British monarch", year: "1926", icon: "👑" },
+      ],
+      "05-29": [
+        { name: "John F. Kennedy", desc: "35th President of the US", year: "1917", icon: "🏛️" },
+      ],
+      "06-14": [
+        { name: "Donald Trump", desc: "45th & 47th President of the US", year: "1946", icon: "🏛️" },
+      ],
+      "07-04": [
+        { name: "Calvin Coolidge", desc: "30th President of the US", year: "1872", icon: "🏛️" },
+      ],
+      "07-10": [
+        { name: "Nikola Tesla", desc: "Electrical engineering genius", year: "1856", icon: "⚡" },
+      ],
+      "07-18": [
+        { name: "Nelson Mandela", desc: "Anti-apartheid leader, President of South Africa", year: "1918", icon: "✊" },
+      ],
+      "07-21": [
+        { name: "Ernest Hemingway", desc: "Nobel Prize-winning author", year: "1899", icon: "📖" },
+        { name: "Robin Williams", desc: "Legendary comedian and actor", year: "1951", icon: "😂" },
+      ],
+      "08-04": [
+        { name: "Barack Obama", desc: "44th President of the US", year: "1961", icon: "🏛️" },
+      ],
+      "08-15": [
+        { name: "Napoleon Bonaparte", desc: "French Emperor", year: "1769", icon: "👑" },
+      ],
+      "08-26": [
+        { name: "Mother Teresa", desc: "Saint, Nobel Peace Prize winner", year: "1910", icon: "🙏" },
+      ],
+      "09-05": [
+        { name: "Freddie Mercury", desc: "Queen frontman, music legend", year: "1946", icon: "🎤" },
+      ],
+      "10-02": [
+        { name: "Mahatma Gandhi", desc: "Leader of Indian independence", year: "1869", icon: "☮️" },
+      ],
+      "10-14": [
+        { name: "Dwight D. Eisenhower", desc: "34th President of the US", year: "1890", icon: "🏛️" },
+      ],
+      "10-28": [
+        { name: "Bill Gates", desc: "Microsoft co-founder, philanthropist", year: "1955", icon: "💻" },
+      ],
+      "11-30": [
+        { name: "Winston Churchill", desc: "British Prime Minister, WWII leader", year: "1874", icon: "🇬🇧" },
+        { name: "Mark Twain", desc: "Author, humorist", year: "1835", icon: "📖" },
+      ],
+      "12-05": [
+        { name: "Walt Disney", desc: "Animation pioneer", year: "1901", icon: "🏰" },
+      ],
+      "12-25": [
+        { name: "Isaac Newton", desc: "Father of classical mechanics", year: "1642", icon: "🍎" },
+        { name: "Jesus Christ", desc: "Central figure of Christianity (traditional date)", year: "~4 BC", icon: "✝️" },
+      ],
+      "12-28": [
+        { name: "Elon Musk", desc: "CEO of Tesla & SpaceX", year: "1971", icon: "🚀" },
+        { name: "Denzel Washington", desc: "Academy Award-winning actor", year: "1954", icon: "🎬" },
+        { name: "Stan Lee", desc: "Marvel Comics creator", year: "1922", icon: "🦸" },
+      ],
+    };
+
+    // ===== HOLIDAY DETECTION =====
+    function getHoliday(date) {
+      const m = date.getMonth() + 1;
+      const d = date.getDate();
+      const key = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+      if (key === '02-14') return { name: "Happy Valentine's Day", icon: "💕", theme: "valentine" };
+      if (key === '12-25') return { name: "Merry Christmas", icon: "🎄", theme: "christmas" };
+      if (key === '12-31' || key === '01-01') return { name: "Happy New Year", icon: "🎆", theme: "newyear" };
+      if (key === '07-04') return { name: "Happy Independence Day", icon: "🇺🇸", theme: "independence" };
+      if (key === '10-31') return { name: "Happy Halloween", icon: "🎃", theme: "halloween" };
+      if (key === '03-17') return { name: "Happy St. Patrick's Day", icon: "☘️", theme: "" };
+      if (key === '11-11') return { name: "Veterans Day — Thank You For Your Service", icon: "🎖️", theme: "" };
+
+      // Easter (approximate - 2026: April 5)
+      if (m === 4 && d >= 3 && d <= 6) return { name: "Happy Easter", icon: "🐣", theme: "easter" };
+      if (m === 4 && d >= 1 && d <= 3) return { name: "Good Friday — A Day of Reflection", icon: "✝️", theme: "" };
+
+      // Thanksgiving (4th Thursday of November - approximate)
+      if (m === 11 && d >= 22 && d <= 28 && date.getDay() === 4)
+        return { name: "Happy Thanksgiving", icon: "🦃", theme: "" };
+
+      return null;
+    }
+
+    // ===== GET WEATHER CSS CLASS =====
+    function getWeatherClass(code, icon) {
+      const isNight = icon && icon.endsWith('n');
+      if (code >= 200 && code < 300) return 'stormy';
+      if (code >= 300 && code < 400) return 'rainy';
+      if (code >= 500 && code < 600) return 'rainy';
+      if (code >= 600 && code < 700) return 'snowy';
+      if (code >= 700 && code < 800) return 'misty';
+      if (code === 800) return isNight ? 'clear-night' : 'sunny';
+      if (code > 800) return 'cloudy';
+      return '';
+    }
+
+    // ===== RAIN PARTICLES =====
+    function RainEffect() {
+      const drops = Array.from({length: 60}, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        duration: 0.5 + Math.random() * 0.5,
+        delay: Math.random() * 2,
+        opacity: 0.3 + Math.random() * 0.5,
+      }));
+      return (
+        <div className="rain-container">
+          {drops.map(d => (
+            <div key={d.id} className="raindrop" style={{
+              left: `${d.left}%`,
+              animationDuration: `${d.duration}s`,
+              animationDelay: `${d.delay}s`,
+              opacity: d.opacity,
+            }}/>
+          ))}
+        </div>
+      );
+    }
+
+    // ===== SNOW PARTICLES =====
+    function SnowEffect() {
+      const flakes = Array.from({length: 40}, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        size: 4 + Math.random() * 8,
+        duration: 4 + Math.random() * 6,
+        delay: Math.random() * 5,
+        opacity: 0.4 + Math.random() * 0.6,
+      }));
+      return (
+        <div className="snow-container">
+          {flakes.map(f => (
+            <div key={f.id} className="snowflake" style={{
+              left: `${f.left}%`,
+              width: `${f.size}px`, height: `${f.size}px`,
+              animationDuration: `${f.duration}s`,
+              animationDelay: `${f.delay}s`,
+              opacity: f.opacity,
+            }}/>
+          ))}
+        </div>
+      );
+    }
+
+    // ===== STARS =====
+    function StarsEffect() {
+      const stars = Array.from({length: 50}, (_, i) => ({
+        id: i, left: Math.random() * 100, top: Math.random() * 100,
+        size: 1 + Math.random() * 2, delay: Math.random() * 3,
+      }));
+      return (
+        <div className="stars">
+          {stars.map(s => (
+            <div key={s.id} className="star" style={{
+              left: `${s.left}%`, top: `${s.top}%`,
+              width: `${s.size}px`, height: `${s.size}px`,
+              animationDelay: `${s.delay}s`,
+            }}/>
+          ))}
+        </div>
+      );
+    }
+
+    // ===== MAIN APP =====
+    function App() {
+      const [query, setQuery] = useState('');
+      const [weather, setWeather] = useState(null);
+      const [forecast, setForecast] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+      const [quote, setQuote] = useState(null);
+      const [weatherClass, setWeatherClass] = useState('');
+      const [holiday, setHoliday] = useState(null);
+      const [todayBirthdays, setTodayBirthdays] = useState([]);
+      const [currentTime, setCurrentTime] = useState(new Date());
+
+      // Live clock - updates every second
+      useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      const today = new Date();
+      const dateKey = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+      const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      // Init quotes, holiday, birthdays
+      useEffect(() => {
+        setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+        setHoliday(getHoliday(today));
+        setTodayBirthdays(birthdayDB[dateKey] || []);
+      }, []);
+
+      // Apply weather + holiday CSS
+      useEffect(() => {
+        document.body.className = '';
+        if (weatherClass) document.body.classList.add(weatherClass);
+        if (holiday && holiday.theme) document.body.classList.add(holiday.theme);
+      }, [weatherClass, holiday]);
+
+      const fetchWeather = useCallback(async (q) => {
+        if (!q.trim()) return;
+        setLoading(true);
+        setError('');
+        try {
+          // If no API key set, use demo data
+          if (OWM_KEY === 'YOUR_OPENWEATHERMAP_API_KEY') {
+            // Demo mode with realistic data
+            await new Promise(r => setTimeout(r, 800));
+            const demoWeather = {
+              name: q, sys: { country: 'US' },
+              main: { temp: 72, feels_like: 74, humidity: 65, pressure: 1015 },
+              weather: [{ id: 802, main: 'Clouds', description: 'scattered clouds', icon: '03d' }],
+              wind: { speed: 8.5 }, visibility: 10000,
+              dt: Date.now()/1000, timezone: -18000,
+            };
+            setWeather(demoWeather);
+            setWeatherClass(getWeatherClass(802, '03d'));
+            setForecast(null);
+            setLoading(false);
+            return;
+          }
+
+          const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(q)}&appid=${OWM_KEY}&units=imperial`
+          );
+          if (!res.ok) throw new Error('City not found. Try "City, Country" format.');
+          const data = await res.json();
+          setWeather(data);
+          setWeatherClass(getWeatherClass(data.weather[0].id, data.weather[0].icon));
+
+          // Fetch 5-day forecast
+          const fRes = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(q)}&appid=${OWM_KEY}&units=imperial&cnt=8`
+          );
+          if (fRes.ok) {
+            const fData = await fRes.json();
+            setForecast(fData.list);
+          }
+        } catch (e) {
+          setError(e.message);
+        }
+        setLoading(false);
+      }, []);
+
+      const handleGeo = () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async (pos) => {
+            setLoading(true);
+            try {
+              if (OWM_KEY === 'YOUR_OPENWEATHERMAP_API_KEY') {
+                setQuery('Royal Palm Beach');
+                fetchWeather('Royal Palm Beach');
+                return;
+              }
+              const res = await fetch(
+                `https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&appid=${OWM_KEY}&units=imperial`
+              );
+              const data = await res.json();
+              setWeather(data);
+              setQuery(data.name);
+              setWeatherClass(getWeatherClass(data.weather[0].id, data.weather[0].icon));
+            } catch(e) { setError('Could not detect location.'); }
+            setLoading(false);
+          });
+        }
+      };
+
+      const newQuote = () => setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+
+      const handleSubmit = (e) => { e.preventDefault(); fetchWeather(query); };
+
+      return (
+        <>
+          {/* Weather Effects */}
+          {weatherClass === 'rainy' && <RainEffect />}
+          {weatherClass === 'stormy' && <><RainEffect /><div className="lightning active" /></>}
+          {weatherClass === 'snowy' && <SnowEffect />}
+          {weatherClass === 'clear-night' && <StarsEffect />}
+
+          <div className="app-container">
+            {/* Header */}
+            <header className="header">
+              <h1 className="logo">Weather<span>Wise</span></h1>
+              <p className="tagline">Live Weather &bull; Daily Wisdom &bull; Today in History</p>
+              <div className="live-clock" style={{margin:'12px auto 4px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+                <span style={{fontSize:'2.5rem',fontFamily:"'Playfair Display',serif",fontWeight:700,letterSpacing:'2px',color:'var(--accent)',textShadow:'0 2px 8px rgba(0,0,0,0.3)'}}>
+                  {currentTime.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true})}
+                </span>
+              </div>
+              <time dateTime={today.toISOString()} style={{fontSize:'0.85rem',color:'var(--text-muted)',display:'block'}}>{dateStr}</time>
+              {weather && weather.timezone !== undefined && (
+                <div style={{fontSize:'0.75rem',color:'var(--text-muted)',marginTop:'2px',opacity:0.7}}>
+                  Local time in {weather.name}: {new Date(Date.now() + (weather.timezone * 1000) + (new Date().getTimezoneOffset() * 60000)).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true})}
+                </div>
+              )}
+            </header>
+
+            {/* Holiday Banner */}
+            {holiday && (
+              <div className="holiday-banner" role="banner">
+                <div className="holiday-icon">{holiday.icon}</div>
+                <div className="holiday-text">{holiday.name}</div>
+              </div>
+            )}
+
+            {/* Search */}
+            <section className="search-section" aria-label="Search for a city">
+              <form className="search-box" onSubmit={handleSubmit}>
+                <input
+                  type="text" value={query} onChange={e => setQuery(e.target.value)}
+                  placeholder="Enter city, country..." aria-label="City search"
+                />
+                <button type="submit" disabled={loading}>{loading ? '...' : 'Search'}</button>
+              </form>
+              <button className="geo-btn" onClick={handleGeo}>📍 Use my location</button>
+            </section>
+
+            {error && <p className="error-msg">{error}</p>}
+
+            {/* Weather Card */}
+            {weather && (
+              <article className="card" itemScope itemType="https://schema.org/Place">
+                <div className="card-title">Current Weather</div>
+                <div className="weather-main">
+                  <div>
+                    <div className="weather-temp">
+                      {Math.round(weather.main.temp)}<sup>°F</sup>
+                    </div>
+                    <div style={{color:'var(--text-muted)', fontSize:'0.85rem', marginTop:'4px'}}>
+                      Feels like {Math.round(weather.main.feels_like)}°F
+                    </div>
+                  </div>
+                  <div className="weather-info">
+                    <div className="weather-icon">{weatherIcons[weather.weather[0].icon] || '🌤️'}</div>
+                    <div className="weather-desc">{weather.weather[0].description}</div>
+                    <div className="weather-city" itemProp="name">
+                      {weather.name}{weather.sys.country ? `, ${weather.sys.country}` : ''}
+                    </div>
+                  </div>
+                </div>
+                <div className="weather-details">
+                  <div className="weather-detail">
+                    <div className="label">Humidity</div>
+                    <div className="value">{weather.main.humidity}%</div>
+                  </div>
+                  <div className="weather-detail">
+                    <div className="label">Wind</div>
+                    <div className="value">{Math.round(weather.wind.speed)} mph</div>
+                  </div>
+                  <div className="weather-detail">
+                    <div className="label">Pressure</div>
+                    <div className="value">{weather.main.pressure} hPa</div>
+                  </div>
+                  <div className="weather-detail">
+                    <div className="label">Visibility</div>
+                    <div className="value">{weather.visibility ? `${(weather.visibility/1609).toFixed(1)} mi` : 'N/A'}</div>
+                  </div>
+                </div>
+              </article>
+            )}
+
+            {/* Forecast */}
+            {forecast && (
+              <section className="card">
+                <div className="card-title">Hourly Forecast</div>
+                <div className="forecast-row">
+                  {forecast.map((f, i) => (
+                    <div className="forecast-item" key={i}>
+                      <div className="time">{new Date(f.dt * 1000).toLocaleTimeString('en-US', {hour:'numeric'})}</div>
+                      <div className="icon">{weatherIcons[f.weather[0].icon] || '🌤️'}</div>
+                      <div className="temp">{Math.round(f.main.temp)}°</div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Ad Slot 1 */}
+            <div className="ad-slot" aria-hidden="true">
+              {/* Google AdSense: Replace with your ad unit code */}
+              {/* <ins class="adsbygoogle" data-ad-client="ca-pub-XXX" data-ad-slot="XXX" data-ad-format="auto"></ins> */}
+              <span>Ad Space — Google AdSense</span>
+            </div>
+
+            {/* Daily Wisdom Quote */}
+            {quote && (
+              <article className="card" itemScope itemType="https://schema.org/Quotation">
+                <div className="card-title">✨ Daily Wisdom</div>
+                <blockquote className="quote-text" itemProp="text">"{quote.text}"</blockquote>
+                <div>
+                  <span className="quote-author" itemProp="creator">— {quote.author}</span>
+                  <span className="quote-category">{quote.category}</span>
+                </div>
+                <button className="new-quote-btn" onClick={newQuote}>New Quote ↻</button>
+              </article>
+            )}
+
+            {/* Today's Famous Birthdays */}
+            <section className="card">
+              <div className="card-title">🎂 Born on This Day — {today.toLocaleDateString('en-US', {month:'long', day:'numeric'})}</div>
+              {todayBirthdays.length > 0 ? (
+                <div className="birthday-list" itemScope itemType="https://schema.org/ItemList">
+                  {todayBirthdays.map((b, i) => (
+                    <div className="birthday-item" key={i} itemProp="itemListElement" itemScope itemType="https://schema.org/Person">
+                      <div className="birthday-avatar">{b.icon}</div>
+                      <div>
+                        <div className="birthday-name" itemProp="name">{b.name}</div>
+                        <div className="birthday-desc" itemProp="description">{b.desc}</div>
+                        <div className="birthday-year">Born {b.year}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{color:'var(--text-muted)', fontSize:'0.9rem'}}>
+                  Check back — we're adding more birthdays daily! Many notable figures were born today throughout history.
+                </p>
+              )}
+            </section>
+
+            {/* Affiliate Section */}
+            <section className="card">
+              <div className="card-title">📚 Recommended Reading</div>
+              <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
+                <a className="affiliate-card" href="#" target="_blank" rel="noopener sponsored">
+                  <div className="affiliate-icon">📖</div>
+                  <div>
+                    <div className="affiliate-title">Meditations — Marcus Aurelius</div>
+                    <div className="affiliate-desc">The timeless Stoic masterpiece on life, virtue, and inner peace.</div>
+                    <div className="affiliate-tag">Affiliate Partner</div>
+                  </div>
+                </a>
+                <a className="affiliate-card" href="#" target="_blank" rel="noopener sponsored">
+                  <div className="affiliate-icon">📖</div>
+                  <div>
+                    <div className="affiliate-title">The Daily Stoic — Ryan Holiday</div>
+                    <div className="affiliate-desc">366 days of wisdom from Seneca, Epictetus, and Marcus Aurelius.</div>
+                    <div className="affiliate-tag">Affiliate Partner</div>
+                  </div>
+                </a>
+                <a className="affiliate-card" href="#" target="_blank" rel="noopener sponsored">
+                  <div className="affiliate-icon">⛅</div>
+                  <div>
+                    <div className="affiliate-title">AcuRite Weather Station</div>
+                    <div className="affiliate-desc">Track your local weather with precision — temperature, humidity, forecast.</div>
+                    <div className="affiliate-tag">Affiliate Partner</div>
+                  </div>
+                </a>
+              </div>
+            </section>
+
+            {/* Ad Slot 2 */}
+            <div className="ad-slot" aria-hidden="true">
+              <span>Ad Space — Google AdSense</span>
+            </div>
+
+            {/* SEO Content Block */}
+            <section className="card" itemScope itemType="https://schema.org/Article">
+              <div className="card-title">About WeatherWise</div>
+              <div style={{fontSize:'0.9rem', lineHeight:'1.7', color:'var(--text-muted)'}}>
+                <p itemProp="description">
+                  <strong style={{color:'var(--text)'}}>WeatherWise</strong> delivers real-time weather
+                  with beautiful dynamic visuals that match current conditions — rain animations when it's raining,
+                  snowflakes when it's snowing, stars on clear nights. Beyond weather, discover daily wisdom from
+                  history's greatest minds: philosophers like Marcus Aurelius and Socrates, scientists like Einstein
+                  and Tesla, spiritual leaders like Mother Teresa, and innovators like Elon Musk and Steve Jobs.
+                </p>
+                <p style={{marginTop:'12px'}}>
+                  Every day features famous birthdays — from American presidents and world leaders to saints, royals,
+                  scientists, and entertainers. Holiday themes celebrate Valentine's Day, Christmas, Easter, and more
+                  with special visuals and messages.
+                </p>
+              </div>
+            </section>
+
+            {/* Footer */}
+            <footer>
+              <p>WeatherWise &copy; {today.getFullYear()} &bull; Built with ❤️</p>
+              <p style={{marginTop:'4px'}}>Weather data by <a href="https://openweathermap.org" target="_blank" rel="noopener">OpenWeatherMap</a></p>
+              <p style={{marginTop:'8px', fontSize:'0.7rem'}}>
+                Quotes sourced from public domain. Affiliate links may earn a commission at no extra cost to you.
+              </p>
+            </footer>
+          </div>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('app')).render(<App />);
+  </script>
+</body>
+</html>
