@@ -1,0 +1,12 @@
+{
+  "name": "weatherwise",
+  "version": "1.0.0",
+  "description": "Live Weather, Daily Wisdom & Today in History — Dynamic weather visuals with quotes from history's greatest minds",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . -p 3000"
+  },
+  "keywords": ["weather", "quotes", "daily wisdom", "today in history", "famous birthdays"],
+  "author": "ktlouhis-creator",
+  "license": "MIT"
+}
